@@ -1,37 +1,43 @@
-import nodemailer from "nodemailer"
-import path from "node:path"
+import { Resend } from 'resend';
+import path from "node:path";
+import fs from "node:fs/promises";
 
-const __dirname = import.meta.dirname
-const dataPath = path.join(__dirname, '../data/invtRec.json')
+const __dirname = import.meta.dirname;
+const dataPath = path.join(__dirname, '../data/invtRec.json');
+
+const resend = new Resend('re_BHKYL2GS_9aYdv1xKayTwXqVciDXYUUM8'); 
 
 export async function createAlert(invstData) {
-
   try {
-    const transporter = nodemailer.createTransport({
-          host: 'smtp.ethereal.email',
-          port: 587,
-          secure: false, 
-          auth: {
-            user: 'piper44@ethereal.email', 
-            pass: 'h3dGCTtvp4NjkCC6Pv'
-          },
-          connectionTimeout: 3000, 
-          greetingTimeout: 3000
-        });
+    const recipient = invstData.userEmail || 'babalolasamuel323@gmail.com';
+    console.log(`✉️ Pushing live report to user web portal: ${recipient}...`);
 
-        const mailOptions = {
-          from: '"GoldDigger App" <no-reply@golddigger.com>',
-          to: invstData.userEmail,
-          subject: '📊 GoldDigger Investment Report',
-          text: `Thanks for using GoldDigger, you bought oz ${invstData.ozBought} of gold for ${invstData.invest}`,
-          html: `<h3> Investment Receipt</h3><p>Thanks for buying <b>${invstData.ozBought} oz</b> of gold for <b>${invstData.invest}</b> on <b>GoldDigger</b></p>`,
-          attachments: [{ filename: 'invstData-Report.json', path: dataPath }]
+    const singleReceiptBuffer = Buffer.from(JSON.stringify(invstData, null, 2), 'utf8');
+
+    const { data, error } = await resend.emails.send({
+      from: 'GoldDigger App <onboarding@resend.dev>', 
+      to: recipient,                        
+      subject: '📊 GoldDigger Investment Report',
+      html: `
+        <h3>🚀 Investment Receipt</h3>
+        <p>Thanks for buying <b>${invstData.ozBought || 0} oz</b> of gold for <b>${invstData.invest || 0}</b> on <b>GoldDigger</b>.</p>
+      `,
+      attachments: [
+        {
+          filename: 'invstData-Report.json',
+          content: singleReceiptBuffer 
         }
+      ]
+    });
 
-        const info = await transporter.sendMail(mailOptions)
-        console.log(`✅ Success! Email captured by Ethereal.`);
-        console.log(`🔗 Preview Sent Email: ${nodemailer.getTestMessageUrl(info)}`);
+    if (error) {
+        console.error("❌ Resend API Refused Delivery:", error);
+        return;
+    }
+
+    console.log(`✅ SUCCESS! Real email delivered straight to the user's inbox! ID: ${data.id}`);
+
   } catch (mailError) {
-        console.error("⚠️ Emitter Mail Delivery Failure:", mailError.message)
+        console.error("💥 Network Transmission Failure:", mailError.message);
     }
 }
