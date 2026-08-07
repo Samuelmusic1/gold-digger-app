@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const interval = setInterval(() => {
       
       const basePrice = 2000;
-      const volatility = (Math.random() - 0.5) * 15; // Randomly swings up or down by up to $7.50
+      const volatility = (Math.random() - 0.5) * 15; 
       const priceAlgor = parseFloat((basePrice + volatility).toFixed(2));
 
       res.write(
