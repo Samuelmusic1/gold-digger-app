@@ -5,7 +5,7 @@ import fs from "node:fs/promises";
 const __dirname = import.meta.dirname;
 const dataPath = path.join(__dirname, '../data/invtRec.json');
 
-const resend = new Resend('re_BHKYL2GS_9aYdv1xKayTwXqVciDXYUUM8'); 
+const resend = new Resend(process.env.RESEND_API_KEY); 
 
 export async function createAlert(invstData) {
   try {
