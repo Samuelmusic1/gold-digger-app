@@ -58,7 +58,7 @@ btnEmailEl.addEventListener('click', async () => {
   try {
     invtAlert.textContent = " "
 
-    const response = await fetch('./invest', {
+    const response = await fetch('/invest', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

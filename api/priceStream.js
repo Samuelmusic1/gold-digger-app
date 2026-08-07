@@ -1,7 +1,3 @@
-
-
-import { priceAlgo } from "../utils/priceAlgo.js";
-
 export default async function handler(req, res) {
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/event-stream");
@@ -11,7 +7,11 @@ export default async function handler(req, res) {
   await new Promise((resolve) => {
     
     const interval = setInterval(() => {
-      const priceAlgor = priceAlgo();
+      
+      const basePrice = 2000;
+      const volatility = (Math.random() - 0.5) * 15; // Randomly swings up or down by up to $7.50
+      const priceAlgor = parseFloat((basePrice + volatility).toFixed(2));
+
       res.write(
         `data: ${JSON.stringify({
           event: 'Price-Updated',
