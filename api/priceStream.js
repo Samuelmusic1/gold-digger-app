@@ -12,11 +12,12 @@ export default async function handler(req, res) {
       const percentChange = (Math.random() - 0.5) * 0.10
       const priceMultiplier = Math.exp(percentChange)
       goldPrice = parseFloat(priceMultiplier * goldPrice)
+      const fixedGoldPrice = goldPrice.toFixed(2)  
 
       res.write(
         `data: ${JSON.stringify({
           event: 'Price-Updated',
-          price: goldPrice
+          price: fixedGoldPrice
         })}\n\n`
       );
     }, 3000);
