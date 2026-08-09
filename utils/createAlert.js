@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import path from "node:path";
 import fs from "node:fs/promises";
+import "dotenv/config";
 
 const __dirname = import.meta.dirname;
 const dataPath = path.join(__dirname, '../data/invtRec.json');

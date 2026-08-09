@@ -1,22 +1,21 @@
 import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import "dotenv/config";
 
 export default async function handler(req, res) {
-
   if (req.method !== 'POST') {
-    res.statusCode = 405;
-    return res.end(JSON.stringify({ status: 'Error', message: 'Method Not Allowed' }));
+    // 🟢 Vercel Native Return Format
+    return res.status(405).json({ status: 'Error', message: 'Method Not Allowed' });
   }
 
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     let body = '';
     for await (const chunk of req) {
       body += chunk;
     }
     const invstData = JSON.parse(body);
     
-    const recipient = invstData.userEmail ;
+    const recipient = invstData.userEmail;
     console.log(`✉️ Pushing live report to user web portal: ${recipient}...`);
 
     invstData.timeStamp = new Date().toISOString();
@@ -40,19 +39,21 @@ export default async function handler(req, res) {
 
     if (error) {
         console.error("❌ Resend API Refused Delivery:", error);
-        res.statusCode = 400;
-        return res.end(JSON.stringify({ status: 'Error', message: error.message }));
+        // 🟢 Vercel Native Return Format
+        return res.status(400).json({ status: 'Error', message: error.message });
     }
 
     console.log(`✅ SUCCESS! Real email delivered straight to the user's inbox! ID: ${data.id}`);
     
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ status: 'Success', message: 'Receipt dispatched successfully!' }));
+    // 🟢 THE CRITICAL FIX: Explicitly send a clean JSON success status across the serverless wire!
+    return res.status(200).json({ 
+        status: 'Success', 
+        message: 'Receipt dispatched successfully!' 
+    });
 
   } catch (mailError) {
         console.error("💥 Network Transmission Failure:", mailError.message);
-        res.statusCode = 500;
-        return res.end(JSON.stringify({ status: 'Error', message: mailError.message }));
+        // 🟢 Vercel Native Return Format
+        return res.status(500).json({ status: 'Error', message: mailError.message });
     }
 }
