@@ -3,7 +3,6 @@ import "dotenv/config";
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    // 🟢 Vercel Native Return Format
     return res.status(405).json({ status: 'Error', message: 'Method Not Allowed' });
   }
 
@@ -39,13 +38,11 @@ export default async function handler(req, res) {
 
     if (error) {
         console.error("❌ Resend API Refused Delivery:", error);
-        // 🟢 Vercel Native Return Format
         return res.status(400).json({ status: 'Error', message: error.message });
     }
 
     console.log(`✅ SUCCESS! Real email delivered straight to the user's inbox! ID: ${data.id}`);
     
-    // 🟢 THE CRITICAL FIX: Explicitly send a clean JSON success status across the serverless wire!
     return res.status(200).json({ 
         status: 'Success', 
         message: 'Receipt dispatched successfully!' 
@@ -53,7 +50,6 @@ export default async function handler(req, res) {
 
   } catch (mailError) {
         console.error("💥 Network Transmission Failure:", mailError.message);
-        // 🟢 Vercel Native Return Format
         return res.status(500).json({ status: 'Error', message: mailError.message });
     }
 }
