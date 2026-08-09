@@ -8,14 +8,15 @@ export default async function handler(req, res) {
     
     const interval = setInterval(() => {
       
-      const basePrice = 2000;
-      const volatility = (Math.random() - 0.5) * 15; 
-      const priceAlgor = parseFloat((basePrice + volatility).toFixed(2));
+      let goldPrice = 3000.00
+      const percentChange = (Math.random() - 0.5) * 0.10
+      const priceMultiplier = Math.exp(percentChange)
+      goldPrice = parseFloat(priceMultiplier * goldPrice)
 
       res.write(
         `data: ${JSON.stringify({
           event: 'Price-Updated',
-          price: priceAlgor
+          price: goldPrice
         })}\n\n`
       );
     }, 3000);
